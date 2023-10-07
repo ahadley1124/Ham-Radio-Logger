@@ -1,0 +1,15 @@
+{
+  "name": "ham_logger_proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "H2 Technologies",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "dependencies": {
+    "node-cache": "^5.1.2",
+    "xml2js": "^0.6.2"
+  }
+}
