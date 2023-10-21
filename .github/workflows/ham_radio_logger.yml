@@ -1,0 +1,110 @@
+name: root/ham_radio_logger
+on:
+  push:
+  workflow_dispatch:
+concurrency:
+  group: "${{ github.ref }}"
+  cancel-in-progress: true
+jobs:
+  test-cargo:
+    runs-on: ubuntu-latest
+    container:
+      image: rust:latest
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: rustc --version && cargo --version
+    - run: cargo test --workspace --verbose
+  github:
+    needs: test-cargo
+    runs-on: ubuntu-latest
+    container:
+      image: rust:latest
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: apt-get update -yqq
+    - run: apt-get install -yqq git
+    - run: git pull https://gitlab.austinh.dev/root/ham_radio_logger main
+    - run: git config --global user.email "admin@gitlab.austinh.dev"
+    - run: git config --global user.name "GitLab Runner"
+    - run: git push -u github main
+  deploy:
+    needs: github
+    runs-on: ubuntu-latest
+    container:
+      image: rust:latest
+    environment: production
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: echo "Define your deployment script!"
+  release_job_windows:
+    needs: test-cargo
+    runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.com/gitlab-org/release-cli:latest
+    if: # Unable to map conditional expression to GitHub Actions equivalent
+#         (success() && ${{ github.ref }})
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: cargo build -r
+    - run: release-cli create --name ${{ github.ref }} --description ${{ github.ref }} --ref ${{ github.ref }}
+    - run: release-cli upload --name "ham-radio-logger.exe" --file "./target/release/ham-radio-logger.exe"
+    - uses: softprops/action-gh-release@v0.1.15
+      with:
+        tag_name: "${{ github.ref }}"
+        body: "${{ github.ref }}"
+  release_job_linux:
+    needs: test-cargo
+    runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.com/gitlab-org/release-cli:latest
+    if: # Unable to map conditional expression to GitHub Actions equivalent
+#         (success() && ${{ github.ref }})
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: cargo build -r
+    - run: release-cli create --name ${{ github.ref }} --description ${{ github.ref }} --ref ${{ github.ref }}
+    - run: release-cli upload --name "ham-radio-logger-unix" --file "./target/release/ham-radio-logger"
+    - uses: softprops/action-gh-release@v0.1.15
+      with:
+        tag_name: "${{ github.ref }}"
+        body: "${{ github.ref }}"
+  release_job_macos:
+    needs: test-cargo
+    runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.com/gitlab-org/release-cli:latest
+    if: # Unable to map conditional expression to GitHub Actions equivalent
+#         (success() && ${{ github.ref }})
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: cargo build -r
+    - run: release-cli create --name ${{ github.ref }} --description ${{ github.ref }} --ref ${{ github.ref }}
+    - run: release-cli upload --name "ham-radio-logger-mac" --file "./target/release/ham-radio-logger"
+    - uses: softprops/action-gh-release@v0.1.15
+      with:
+        tag_name: "${{ github.ref }}"
+        body: "${{ github.ref }}"
