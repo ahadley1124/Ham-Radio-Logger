@@ -7,4 +7,14 @@ edition = "2021"
 
 [dependencies]
 reqwest = "0.11.20"
+serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.107"
+surrealdb = { version = "2.1.4", features = ["protocol-http"] }
+tokio = { version = "1.42.0", features = ["macros", "rt-multi-thread"] }
+
+[profile.release]
+lto = true
+strip = true
+opt-level = 3
+panic = 'abort'
+codegen-units = 1
