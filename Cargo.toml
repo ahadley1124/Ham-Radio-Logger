@@ -9,5 +9,5 @@ edition = "2021"
 reqwest = "0.11.20"
 serde_json = "1.0.107"
 sqlite = { version = "0.31.1", features = ["bundled"] }
-tokio = { version = "1.32.0", features = ["full"] }
+tokio = { version = "1.38.2", features = ["full"] }
 whoami = "1.4.1"
